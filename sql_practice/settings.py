@@ -80,6 +80,16 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'heroku_34e0e4bf742bdb7',
+#         'USER': 'b78cb54aa04c41',
+#         'PASSWORD': '2254df6c',
+#         'HOST': 'eu-cdbr-west-03.cleardb.net',
+#         'PORT': '3306',
+#     }
+# }
 
 
 # Password validation

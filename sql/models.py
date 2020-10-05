@@ -1,6 +1,13 @@
 from django.db import models
 
-# Create your models here.
+
 class Person(models.Model):
-    name = models.CharField(max_length = 100)
-    age = models.IntegerField()
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=50, blank=True, null=True)
+    gender = models.CharField(max_length=1, blank=True, null=True)
+    birth_date = models.DateField(blank=True, null=True)
+
+
+class Relation(models.Model):
+    person_id = models.ForeignKey(Person, related_name='person_id', on_delete=models.CASCADE)
+    child_id = models.ForeignKey(Person, related_name='child_id', on_delete=models.CASCADE)
