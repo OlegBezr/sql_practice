@@ -1,0 +1,264 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link 
+        rel="stylesheet" 
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" 
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" 
+        crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<style>
+    .row {
+        display: flex;
+        justify-content: center;
+    }
+
+    .table, .tab_block {
+        margin-left: 2%;
+    }
+
+    /* Style the tab */
+    .tab {
+        overflow: hidden;
+        border: 1px solid #ccc;
+        background-color: #f1f1f1;
+    }
+
+    /* Style the buttons that are used to open the tab content */
+    .tab button {
+        background-color: inherit;
+        float: left;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        padding: 14px 16px;
+        transition: 0.3s;
+    }
+
+    /* Change background color of buttons on hover */
+    .tab button:hover {
+        background-color: #ddd;
+    }
+
+    /* Create an active/current tablink class */
+    .tab button.active {
+        background-color: #ccc;
+    }
+
+    /* Style the tab content */
+    .tabcontent {
+        display: none;
+        padding: 6px 12px;
+        border: 1px solid #ccc;
+        border-top: none;
+    }
+</style>
+<body>
+<div class="row">
+    <div class="row">
+        <div class="table">
+            <table border="1">
+                <tr>
+                    {% for field in person_fields %}
+                    <td>{{ field.name }}</td>
+                    {% endfor %}
+                </tr>
+                {% for person in persons %}
+                <tr>
+                    <td>{{ person.id }}</td>
+                    <td>{{ person.name }}</td>
+                    <td>{{ person.gender }}</td>
+                    <td>{{ person.birth_date }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            <a href="/get_persons">Download</a>
+        </div>
+        <div class="table">
+            <table border="1">
+                <tr>
+                    {% for field in relation_fields %}
+                    <td>{{ field.name }}</td>
+                    {% endfor %}
+                </tr>
+                {% for relation in relations %}
+                <tr>
+                    <td>{{ relation.id }}</td>
+                    <td>{{ relation.person.name }}</td>
+                    <td>{{ relation.child.name }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            <a href="/get_relations">Download</a>
+        </div>
+    </div>
+    <div class="tab_block">
+        <!-- Tab links -->
+        <div class="tab">
+            <button class="tablinks active" id="add_user" onclick="openCity(event, 'Add person')">Add person</button>
+            <button class="tablinks" onclick="openCity(event, 'Update person')">Update person</button>
+            <button class="tablinks" onclick="openCity(event, 'Delete person')">Delete person</button>
+            <button class="tablinks active" onclick="openCity(event, 'Add relation')">Add relation</button>
+            <button class="tablinks" onclick="openCity(event, 'Update relation')">Update relation</button>
+            <button class="tablinks" onclick="openCity(event, 'Delete relation')">Delete relation</button>
+        </div>
+        <!-- Tab content -->
+        <div id="Add person" class="tabcontent">
+            <div>
+                <form method="POST">
+                    {% csrf_token %}
+                    <input hidden type="text" name="type" value="add_person">
+                    <a>Person ID</a><br>
+                    <input required type="number" name="id"><br>
+                    <a>Name</a><br>
+                    <input required type="text" name="name"><br>
+                    <a>Gender</a><br>
+                    <input required type="text" name="gender"><br>
+                    <a>Date of birth</a><br>
+                    <input required type="date" name="birth_date"><br><br>
+                    <input type="submit" value="Add" class="btn btn-secondary">
+                </form>
+            </div>
+        </div>
+
+        <div id="Update person" class="tabcontent">
+            <div class="form">
+                <form method="POST">
+                    {% csrf_token %}
+                    <input required hidden type="text" name="type" value="update_person">
+                    <a>Person ID</a><br>
+                    <select name="id" class="browser-default custom-select">
+                        {% for id in person_ids %}
+                        <option value="{{id}}">{{id}}</option>
+                        {% endfor %}
+                    </select><br>
+                    <a>Name</a><br>
+                    <input type="text" name="name"><br>
+                    <a>Gender</a><br>
+                    <input type="text" name="gender"><br>
+                    <a>Date of birth</a><br>
+                    <input type="date" name="birth_date"><br><br>
+                    <input type="submit" value="Update" class="btn btn-secondary">
+                </form>
+            </div>
+        </div>
+
+        <div id="Delete person" class="tabcontent">
+            <div class="form">
+                <form method="POST">
+                    {% csrf_token %}
+                    <input hidden type="text" name="type" value="delete_person">
+                    <a>Person ID</a><br>
+                    <select name="id" class="browser-default custom-select">
+                        {% for id in person_ids %}
+                        <option value="{{id}}">{{id}}</option>
+                        {% endfor %}
+                    </select><br><br>
+                    <input type="submit" value="Delete" class="btn btn-secondary">
+                </form>
+            </div>
+        </div>
+
+        <div id="Add relation" class="tabcontent">
+            <div class="form">
+                <form method="POST">
+                    {% csrf_token %}
+                    <input hidden type="text" name="type" value="add_relation">
+                    <a>Person ID</a><br>
+                    <select name="person_id" class="browser-default custom-select">
+                        {% for id in person_ids %}
+                        <option value="{{id}}">{{id}}</option>
+                        {% endfor %}
+                    </select><br><br>
+                    <a>Child ID</a><br>
+                    <select name="child_id" class="browser-default custom-select">
+                        {% for id in person_ids %}
+                        <option value="{{id}}">{{id}}</option>
+                        {% endfor %}
+                    </select><br><br>
+                    <input type="submit" value="Add" class="btn btn-secondary">
+                </form>
+            </div>
+        </div>
+
+        <div id="Update relation" class="tabcontent">
+            <div class="form">
+                <form method="POST">
+                    {% csrf_token %}
+                    <input hidden type="text" name="type" value="update_relation">
+                    <a>Relation ID</a><br>
+                    <select name="relation_id" class="browser-default custom-select">
+                        {% for id in relation_ids %}
+                        <option value="{{id}}">{{id}}</option>
+                        {% endfor %}
+                    </select><br><br>
+                    <a>Person ID</a><br>
+                    <select name="person_id" class="browser-default custom-select">
+                        {% for id in person_ids %}
+                        <option value="{{id}}">{{id}}</option>
+                        {% endfor %}
+                    </select><br><br>
+                    <a>Child ID</a><br>
+                    <select name="child_id" class="browser-default custom-select">
+                        {% for id in person_ids %}
+                        <option value="{{id}}">{{id}}</option>
+                        {% endfor %}
+                    </select><br><br>
+                    <input type="submit" value="Update" class="btn btn-secondary">
+                </form>
+            </div>
+        </div>
+        <div id="Delete relation" class="tabcontent">
+            <div class="form">
+                <form method="POST">
+                    {% csrf_token %}
+                    <input hidden type="text" name="type" value="delete_relation">
+                    <a>Relation ID</a><br>
+                    <select name="relation_id" class="browser-default custom-select">
+                        {% for id in relation_ids %}
+                        <option value="{{id}}">{{id}}</option>
+                        {% endfor %}
+                    </select><br><br>
+                    <input type="submit" value="Delete" class="btn btn-secondary">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openCity(evt, cityName) {
+        var i, tabcontent, tablinks, tabcontent_parents, tablinks_parents;
+
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+
+        // Show the current tab, and add an "active" class to the button that opened the tab
+        document.getElementById(cityName).style.display = "block";
+        evt.currentTarget.className += " active";
+    }
+
+    openCity(event, 'Add user');
+</script>
+<script>
+    document.getElementById("add_user").classList.add("active");
+</script>
+
+<!-- bootstrap JS
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="static/FB_advicer/js/bootstrap.file-input.js"></script> -->
+</body>
+</html>
